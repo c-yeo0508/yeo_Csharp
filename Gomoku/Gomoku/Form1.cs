@@ -19,7 +19,7 @@ namespace Gomoku
         int margin = 40;　//親メニューとの間隔
         int distance = 28;　//線と線の間の距離
         int stoneSize = 27; //碁石の大きさ
-        int stoneCnt = 0; //碁石の順番をカウント
+        int stoneCnt = 1; //碁石の順番をカウント
         
 
         List<Save> lstSave = new List<Save> ();
@@ -139,7 +139,7 @@ namespace Gomoku
                 Bitmap bmp = new Bitmap(imagePath);
                 g.DrawImage(bmp, r);
                 ShowCount(stoneCnt, Brushes.White, r);
-                lstSave.Add(new Save(x, y, STONE.black, stoneCnt));
+                lstSave.Add(new Save(x, y, STONE.black, stoneCnt++));
                 flag = true;
                 goban[x, y] = STONE.black;
             }
@@ -149,7 +149,7 @@ namespace Gomoku
                 Bitmap bmp = new Bitmap(imagePath);
                 g.DrawImage(bmp, r);
                 ShowCount(stoneCnt, Brushes.Black, r);
-                lstSave.Add(new Save(x, y, STONE.white, stoneCnt));
+                lstSave.Add(new Save(x, y, STONE.white, stoneCnt++));
                 flag = false;
                 goban[x, y] = STONE.white;
             }

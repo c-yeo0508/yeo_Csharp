@@ -1,4 +1,3 @@
-bin/
-obj/
-
-**goishi/**
+.vs/
+Gomoku/bin/
+Gomoku/obj/
