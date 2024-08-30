@@ -19,7 +19,7 @@ namespace Gomoku
         int margin = 40;　//親メニューとの間隔
         int distance = 28;　//線と線の間の距離
         int stoneSize = 27; //碁石の大きさ
-        int stoneCnt = 1; //碁石の順番をカウント
+        int stoneCnt = 0; //碁石の順番をカウント
         
 
         List<Save> lstSave = new List<Save> ();
@@ -50,7 +50,7 @@ namespace Gomoku
             DrawBoard();
             DrawStone();
         }
-                private void DrawBoard()
+        private void DrawBoard()
         {
             //panel1にGraphicsオブジェクト作成
             g = panel1.CreateGraphics();
@@ -74,7 +74,6 @@ namespace Gomoku
         private void DrawStone()
         {
             string imagePath;
-            //stoneCnt = 1; //消したら2から始まる…なんでだろう
 
             for (int x = 0; x < 19; x++)
                 for (int y = 0; y < 19; y++)
@@ -85,7 +84,7 @@ namespace Gomoku
                         g.DrawImage(bmp, margin + x * distance - stoneSize / 2,
                             margin + y * distance - stoneSize / 2, stoneSize, stoneSize);
 
-                        ShowCount(GetStoneCount(x, y), Brushes.White, new Rectangle(
+                        ShowCount(GetStoneCount(x,y), Brushes.White, new Rectangle(
                             margin + x * distance - (stoneSize / 2),
                             margin + y * distance - (stoneSize / 2),
                             stoneSize, stoneSize));
@@ -130,13 +129,6 @@ namespace Gomoku
                 margin + distance * y - (stoneSize / 2),
                 stoneSize, stoneSize);
 
-            //Rectangle r = new Rectangle(
-            //    centerX - (stoneSize / 2),
-            //    centerY - (stoneSize / 2),
-            //    stoneSize, stoneSize);
-
-            //string baseDirectory = Directory.GetCurrentDirectory();
-
             string imagePath;
             if (flag == false)
             {
@@ -158,7 +150,6 @@ namespace Gomoku
                 flag = false;
                 goban[x, y] = STONE.white;
             }
-
             checkWin(x, y);
 
 
@@ -204,8 +195,7 @@ namespace Gomoku
         {
 
             string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "Post mortem");
-            string fileName = DateTime.Now.ToShortDateString() + "-"
-                + DateTime.Now.Hour+DateTime.Now.Minute+".csv";
+            string fileName = DateTime.Now.ToString("yyyy-MM-dd-HHmm") + ".csv";
             string fileData = Path.Combine(folderPath, fileName);
             FileStream fileStream = new FileStream(fileData, FileMode.Create);
             StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
@@ -256,6 +246,7 @@ namespace Gomoku
         private void showCountToolStripMenuItem_Click(object sender, EventArgs e)
         {
             showCountFlag = !showCountFlag;
+            //stoneCnt++;
             DrawStone();
         }
 

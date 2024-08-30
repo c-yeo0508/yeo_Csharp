@@ -37,9 +37,9 @@
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\sprin\\OneDrive\\Desktop\\yeo_Csharp-main\\Gomoku\\Gomoku\\Form1.cs",
               "RelativeDocumentMoniker": "Gomoku\\Form1.cs",
-              "ToolTip": "C:\\Users\\sprin\\OneDrive\\Desktop\\yeo_Csharp-main\\Gomoku\\Gomoku\\Form1.cs",
-              "RelativeToolTip": "Gomoku\\Form1.cs",
-              "ViewState": "AgIAAPYAAAAAAAAAAAAAwPkAAAAAAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\sprin\\OneDrive\\Desktop\\yeo_Csharp-main\\Gomoku\\Gomoku\\Form1.cs*",
+              "RelativeToolTip": "Gomoku\\Form1.cs*",
+              "ViewState": "AgIAAOQAAAAAAAAAAAAAwPcAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-08-15T05:11:33.866Z",
               "IsPinned": true,
@@ -55,8 +55,7 @@
               "RelativeToolTip": "Gomoku\\Form1.cs [\uB514\uC790\uC778]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-08-15T05:10:26.498Z",
-              "IsPinned": true,
-              "EditorCaption": " [\uB514\uC790\uC778]"
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -81,8 +80,7 @@
               "RelativeToolTip": "Gomoku\\Form1.Designer.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-20T00:09:55.406Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-20T00:09:55.406Z"
             },
             {
               "$type": "Document",
