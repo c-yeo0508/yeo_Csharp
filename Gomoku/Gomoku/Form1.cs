@@ -12,14 +12,14 @@ using System.Windows.Forms;
 
 namespace Gomoku
 {
-    enum STONE { none, black, white };
+    enum Color { none, black, white };
 
     public partial class Form1 : Form
     {
         int margin = 40;　//親メニューとの間隔
         int distance = 28;　//線と線の間の距離
         int stoneSize = 27; //碁石の大きさ
-        int stoneCnt = 1; //碁石の順番をカウント
+        int stoneCnt = 0; //碁石の順番をカウント
         
 
         List<Save> lstSave = new List<Save> ();
@@ -36,11 +36,11 @@ namespace Gomoku
             InitializeComponent();
 
             this.Text = "Gomoku";
-            this.BackColor = Color.BlanchedAlmond;
+            this.BackColor = System.Drawing.Color.BlanchedAlmond;
 
-            pen = new Pen(Color.Black);
-            bBrush = new SolidBrush(Color.Black);
-            wBrush = new SolidBrush(Color.White);
+            pen = new Pen(System.Drawing.Color.Black);
+            bBrush = new SolidBrush(System.Drawing.Color.Black);
+            wBrush = new SolidBrush(System.Drawing.Color.White);
 
             this.ClientSize = new Size(2 * margin + 18 * distance,
                 2 * margin + 18 * distance + menuStrip1.Height);
@@ -77,7 +77,7 @@ namespace Gomoku
 
             for (int x = 0; x < 19; x++)
                 for (int y = 0; y < 19; y++)
-                    if (goban[x, y] == STONE.black)
+                    if (goban[x, y] == Color.black)
                     {
                         imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "goishi", "kuro.png");
                         Bitmap bmp = new Bitmap(imagePath);
@@ -89,7 +89,7 @@ namespace Gomoku
                             margin + y * distance - (stoneSize / 2),
                             stoneSize, stoneSize));
                     }
-                    else if (goban[x, y] == STONE.white)
+                    else if (goban[x, y] == Color.white)
                     {
                         imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "goishi", "shiro.png");
                         Bitmap bmp = new Bitmap(imagePath);
@@ -120,11 +120,11 @@ namespace Gomoku
 
 
             //マウスのクリックで石を置く
-            //if (goban[x, y] != STONE.none)
+            //if (goban[x, y] != Color.none)
             //    return;
 
             //石の重複を防止
-            if (x < 0 || x >= 19 || y < 0 || y >= 19 || goban[x, y] != STONE.none)
+            if (x < 0 || x >= 19 || y < 0 || y >= 19 || goban[x, y] != Color.none)
                 return;
 
             Rectangle r = new Rectangle(
@@ -132,30 +132,35 @@ namespace Gomoku
                 margin + distance * y - (stoneSize / 2),
                 stoneSize, stoneSize);
 
-            string imagePath;
+            string imagePath = AppDomain.CurrentDomain.BaseDirectory;
+            stoneCnt++;
+            // 黒が置かれた場合
             if (flag == false)
             {
-                imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "goishi", "kuro.png");
+                // 碁石の情報を生成
+                var stone = new Save(x, y, Color.black, stoneCnt);
+                imagePath = Path.Combine(imagePath, "goishi", "kuro.png");
                 Bitmap bmp = new Bitmap(imagePath);
                 g.DrawImage(bmp, r);
                 ShowCount(stoneCnt, Brushes.White, r);
-                lstSave.Add(new Save(x, y, STONE.black, stoneCnt++));
+                lstSave.Add(stone);
                 flag = true;
-                goban[x, y] = STONE.black;
+                goban[x, y] = stone.color;
             }
+            // 白が置かれた場合
             else
             {
-                imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "goishi", "shiro.png");
+                var stone = new Save(x, y, Color.white, stoneCnt);
+                imagePath = Path.Combine(imagePath,"goishi", "shiro.png");
                 Bitmap bmp = new Bitmap(imagePath);
                 g.DrawImage(bmp, r);
                 ShowCount(stoneCnt, Brushes.Black, r);
-                lstSave.Add(new Save(x, y, STONE.white, stoneCnt++));
+                lstSave.Add(stone);
                 flag = false;
-                goban[x, y] = STONE.white;
+                goban[x, y] = stone.color;
             }
+            // 勝利判定
             checkWin(x, y);
-
-
         }
         private int GetStoneCount(int x, int y)
         {
@@ -174,19 +179,19 @@ namespace Gomoku
         {
             //碁石の状態を初期化
             flag = false;
-            goban = new STONE[19, 19];
+            goban = new Color[19, 19];
             //明日確認
-            stoneCnt = 1;
+            stoneCnt = 0;
             lstSave.Clear();
 
             //for (int x = 0; x < 19; x++)
             //    for (int y = 0; y < 19; y++)
-            //goban[x, ] = STONE.none;
+            //goban[x, ] = Color.none;
 
             //碁盤を再描画
             this.Refresh();
 
-            if (goban[0, 1] == STONE.none)
+            if (goban[0, 1] == Color.none)
             {
                 //MessageBox.Show("noneです！");
             }
@@ -207,7 +212,7 @@ namespace Gomoku
             //要素を追加
             foreach (Save item in lstSave)
             {
-                streamWriter.WriteLine("{0}, {1}, {2}, {3}", item.X, item.Y, item.stone, item.seq);
+                streamWriter.WriteLine("{0}, {1}, {2}, {3}", item.X, item.Y, item.color, item.seq);
             }
             streamWriter.Close();
             fileStream.Close();
@@ -226,7 +231,7 @@ namespace Gomoku
 
             DialogResult end;
 
-            if (goban[x,y] == STONE.black)
+            if (goban[x,y] == Color.black)
             {
                 end = MessageBox.Show("黒の勝ちです!\n新しいゲームを始めますか？","ゲーム終了",MessageBoxButtons.YesNo);
             }
@@ -249,7 +254,6 @@ namespace Gomoku
         private void showCountToolStripMenuItem_Click(object sender, EventArgs e)
         {
             showCountFlag = !showCountFlag;
-            //stoneCnt++;
             DrawStone();
         }
 
@@ -267,80 +271,77 @@ namespace Gomoku
         private void checkWin(int x, int y)
         {
 
-            int cnt = 1;
+            int horizontalCnt = 1;
+            int virticalCnt = 1;
+            int leftDiagonalCnt = 1;
+            int rightDiagonallyCnt = 1;
 
             //右方向
             for (int i = x + 1; i < 19; i++)
                 if (goban[i, y] == goban[x, y])
-                    cnt++;
+                    horizontalCnt++;
                 else
                     break;
 
             //左方向
             for (int i = x - 1; i >= 0; i--)
                 if (goban[i, y] == goban[x, y])
-                    cnt++;
+                    horizontalCnt++;
                 else
                     break;
 
-            if (cnt >= 5)
-            {
-                WinGame(x, y);
-                return;
-            }
+            //if (horizontalCnt >= 5)
+            //{
+            //    WinGame(x, y);
+            //    return;
+            //}
 
-            cnt = 1;
 
             //上方向
             for (int j = y - 1; j >= 0; j--)
                 if (goban[x, j] == goban[x, y])
-                    cnt++;
+                    virticalCnt++;
                 else
                     break;
 
             //下方向
             for (int j = y + 1; j < 19; j++)
                 if (goban[x, j] == goban[x, y])
-                    cnt++;
+                    virticalCnt++;
                 else
                     break;
 
-            if (cnt >= 5)
-            {
-                WinGame(x, y);
-                return;
-            }
-
-            cnt = 1;
+            //if (virticalCnt >= 5)
+            //{
+            //    WinGame(x, y);
+            //    return;
+            //}
 
             //左上方向
             for (int i = x - 1, j = y -1; i >= 0 && j >= 0; i-- , j--)
                     if (goban[i, j] == goban[x, y])
-                        cnt++;
+                    leftDiagonalCnt++;
                     else
                         break;
 
             //右下
             for (int i = x + 1, j = y + 1; i < 19 && j < 19; i++, j++)
                 if (goban[i, j] == goban[x, y])
-                    cnt++;
+                    leftDiagonalCnt++;
                 else
                     break;
 
-            if (cnt >= 5)
-            {
-                WinGame(x, y);
-                return;
-            }
-
-
-            cnt = 1;
+            //if (leftDiagonalCnt >= 5)
+            //{
+            //    WinGame(x, y);
+            //    return;
+            //}
 
             //右上
 
             for (int i = x + 1, j = y - 1; i < 19 && j >= 0; i++, j--)
                 if (goban[i, j] == goban[x, y])
-                    cnt++;
+                    rightDiagonallyCnt++;
                 else
                     break;
 
@@ -348,11 +349,12 @@ namespace Gomoku
 
             for (int i = x - 1, j = y + 1; i >= 0 && j < 19; i--, j++)
                 if (goban[i, j] == goban[x, y])
-                    cnt++;
+                    rightDiagonallyCnt++;
                 else
                     break;
 
-            if (cnt >= 5)
+            // 5個並んだ場合は勝利と判定
+            if (rightDiagonallyCnt >= 5 || leftDiagonalCnt >= 5 || virticalCnt >= 5 || horizontalCnt >= 5)
             {
                 WinGame(x, y);
                 return;

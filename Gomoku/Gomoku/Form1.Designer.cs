@@ -2,7 +2,7 @@
 {
     partial class Form1
     {
-        STONE[,] goban = new STONE[19, 19];
+        Color[,] goban = new Color[19, 19];
         bool flag = false; // false = black , true = white
         /// <summary>
         /// 必要なデザイナー変数です。

@@ -10,14 +10,14 @@ namespace Gomoku
     {
         public int X {  get; set; }
         public int Y { get; set; }
-        public STONE stone { get; set; }
+        public Color color { get; set; }
         public int seq { get; set; }
         
-        public Save(int x, int y, STONE s, int seq)
+        public Save(int x, int y, Color color, int seq)
         {
             this.X = x;
             this.Y = y;
-            this.stone = s;
+            this.color = color;
             this.seq = seq;
         }
     }
