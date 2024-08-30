@@ -105,6 +105,9 @@ namespace Gomoku
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
+
+            
+
             if (saveFlag == true)
             {
                 saveGame();
@@ -135,7 +138,7 @@ namespace Gomoku
                 imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "goishi", "kuro.png");
                 Bitmap bmp = new Bitmap(imagePath);
                 g.DrawImage(bmp, r);
-                ShowCount(stoneCnt++, Brushes.White, r);
+                ShowCount(stoneCnt, Brushes.White, r);
                 lstSave.Add(new Save(x, y, STONE.black, stoneCnt));
                 flag = true;
                 goban[x, y] = STONE.black;
@@ -145,7 +148,7 @@ namespace Gomoku
                 imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "goishi", "shiro.png");
                 Bitmap bmp = new Bitmap(imagePath);
                 g.DrawImage(bmp, r);
-                ShowCount(stoneCnt++, Brushes.Black, r);
+                ShowCount(stoneCnt, Brushes.Black, r);
                 lstSave.Add(new Save(x, y, STONE.white, stoneCnt));
                 flag = false;
                 goban[x, y] = STONE.white;
