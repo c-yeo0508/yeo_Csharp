@@ -196,7 +196,7 @@ namespace Gomoku
         //ゲームのデータを保存する
         private void saveGame()
         {
-
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "Post mortem");
             string fileName = DateTime.Now.ToString("yyyy-MM-dd-HHmm") + ".csv";
             string fileData = Path.Combine(folderPath, fileName);
@@ -261,6 +261,69 @@ namespace Gomoku
                 stringFormat.Alignment = StringAlignment.Center;
                 stringFormat.LineAlignment = StringAlignment.Center;
                 g.DrawString(v.ToString(), font, color, r, stringFormat);
+            }
+        }
+
+        private void Undo()
+        {
+            if (lstSave.Count == 0)
+            {
+                MessageBox.Show("石をおいてください。");
+                return;
+            }
+
+            // 最近のSave要素を取得、リストから削除
+            Save lastSave = lstSave.Last();
+            lstSave.Remove(lastSave);
+
+            // 碁盤リセット、初期化
+            goban[lastSave.X, lastSave.Y] = STONE.none;
+            this.Refresh();
+
+            // 碁石のカウント確認
+            stoneCnt = lastSave.seq;
+
+            // プレイヤーの順番更新
+            flag = !flag;
+        }
+
+        private void undoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Undo();
+        }
+
+        private void postMortem()
+        {
+
+        }
+
+        private void postMortemToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "Post mortem");
+            OpenFileDialog openfile = new OpenFileDialog();
+            openfile.InitialDirectory = folderPath;
+            openfile.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+            openfile.FilterIndex = 1;
+            openfile.RestoreDirectory = true;
+
+            if (openfile.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = openfile.FileName;
+
+                try
+                {
+                    using (StreamReader sr = new StreamReader(fileName))
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        string[] data = line.Split(',');
+                        Console.WriteLine("{0},{1},{2},{3}");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("OK");
+                }
             }
         }
 

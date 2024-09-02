@@ -33,9 +33,10 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showCountToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.showCountToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.postMortemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,7 +59,8 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newGameToolStripMenuItem,
             this.undoToolStripMenuItem,
-            this.showCountToolStripMenuItem});
+            this.showCountToolStripMenuItem,
+            this.postMortemToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -75,6 +77,14 @@
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
             this.undoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.undoToolStripMenuItem.Text = "undo";
+            this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
+            // 
+            // showCountToolStripMenuItem
+            // 
+            this.showCountToolStripMenuItem.Name = "showCountToolStripMenuItem";
+            this.showCountToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showCountToolStripMenuItem.Text = "Show count";
+            this.showCountToolStripMenuItem.Click += new System.EventHandler(this.showCountToolStripMenuItem_Click);
             // 
             // viewToolStripMenuItem
             // 
@@ -93,12 +103,12 @@
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseDown);
             // 
-            // showCountToolStripMenuItem
+            // postMortemToolStripMenuItem
             // 
-            this.showCountToolStripMenuItem.Name = "showCountToolStripMenuItem";
-            this.showCountToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.showCountToolStripMenuItem.Text = "Show count";
-            this.showCountToolStripMenuItem.Click += new System.EventHandler(this.showCountToolStripMenuItem_Click);
+            this.postMortemToolStripMenuItem.Name = "postMortemToolStripMenuItem";
+            this.postMortemToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.postMortemToolStripMenuItem.Text = "Post mortem";
+            this.postMortemToolStripMenuItem.Click += new System.EventHandler(this.postMortemToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -127,6 +137,7 @@
         private System.Windows.Forms.ToolStripMenuItem newGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showCountToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem postMortemToolStripMenuItem;
     }
 }
 
