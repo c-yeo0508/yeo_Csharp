@@ -347,13 +347,12 @@ namespace Gomoku
                 ShowCount(seq, Brushes.Black, r);
                 goban[x, y] = STONE.white;
             }
-            WinGame(x, y);
+            checkWin(x, y);
         }
 
         private void postMortemToolStripMenuItem_Click(object sender, EventArgs e)
         {
             setGame();
-
             string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "Post mortem");
             OpenFileDialog openfile = new OpenFileDialog();
             openfile.InitialDirectory = folderPath;
