@@ -4,11 +4,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Schema;
 
 namespace Gomoku
 {
@@ -23,6 +25,7 @@ namespace Gomoku
         
 
         List<Save> lstSave = new List<Save> ();
+        int sequence = 0;
         bool saveFlag = false;
         bool showCountFlag = false;
 
@@ -105,12 +108,10 @@ namespace Gomoku
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
-
-            
-
             if (saveFlag == true)
             {
-                saveGame();
+                Console.Write(saveFlag);
+                postMortem();
                 return;
             }
 
@@ -197,9 +198,18 @@ namespace Gomoku
         private void saveGame()
         {
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "Post mortem");
-            string fileName = DateTime.Now.ToString("yyyy-MM-dd-HHmm") + ".csv";
+            string folderPath = Path.Combine(baseDirectory + "Post mortem");
+
+            //フォルダーが存在しない場合
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            string fileName = DateTime.Now.ToString("yyyy-MM-dd-HHmmss") + ".csv";
             string fileData = Path.Combine(folderPath, fileName);
+
+
             FileStream fileStream = new FileStream(fileData, FileMode.Create);
             StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
 
@@ -207,7 +217,7 @@ namespace Gomoku
             //要素を追加
             foreach (Save item in lstSave)
             {
-                streamWriter.WriteLine("{0}, {1}, {2}, {3}", item.X, item.Y, item.stone, item.seq);
+                streamWriter.WriteLine("{0},{1},{2},{3}", item.X, item.Y, item.stone, item.seq);
             }
             streamWriter.Close();
             fileStream.Close();
@@ -294,11 +304,56 @@ namespace Gomoku
 
         private void postMortem()
         {
+            Console.WriteLine("Sequence before drawing: " + sequence);
+            Console.WriteLine("lstSave count before drawing: " + lstSave.Count);
 
+            if (sequence < lstSave.Count)
+            {
+                Console.WriteLine("Drawing stone with sequence: " + sequence);
+                drawAStone(lstSave[sequence++]);
+            }
+            else
+            {
+                Console.WriteLine("No more stones to draw. Sequence: " + sequence + ", Count: " + lstSave.Count);
+            }
+        }
+
+        private void drawAStone(Save item)
+        {
+            int x = item.X;
+            int y = item.Y;
+            STONE s = item.stone;
+            int seq = item.seq;
+
+            Rectangle r = new Rectangle(
+                margin + distance * x - stoneSize / 2,
+                margin + distance * y - stoneSize / 2,
+                stoneSize, stoneSize);
+
+            string imagePath;
+            if (s == STONE.black)
+            {
+                imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "goishi", "kuro.png");
+                Bitmap bmp = new Bitmap(imagePath);
+                g.DrawImage(bmp, r);
+                ShowCount(seq, Brushes.White, r);
+                goban[x, y] = STONE.black;
+            }
+            else
+            {
+                imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "goishi", "shiro.png");
+                Bitmap bmp = new Bitmap(imagePath);
+                g.DrawImage(bmp, r);
+                ShowCount(seq, Brushes.Black, r);
+                goban[x, y] = STONE.white;
+            }
+            WinGame(x, y);
         }
 
         private void postMortemToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            setGame();
+
             string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "Post mortem");
             OpenFileDialog openfile = new OpenFileDialog();
             openfile.InitialDirectory = folderPath;
@@ -313,17 +368,31 @@ namespace Gomoku
                 try
                 {
                     using (StreamReader sr = new StreamReader(fileName))
-                    while (!sr.EndOfStream)
                     {
-                        string line = sr.ReadLine();
-                        string[] data = line.Split(',');
-                        Console.WriteLine("{0},{1},{2},{3}");
+                        string line = "";
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            string[] items = line.Split(',');
+
+                            Console.WriteLine("x: " + items[0]);
+                            Console.WriteLine("y: " + items[1]);
+                            Console.WriteLine("stone: " + items[2]);
+                            Console.WriteLine("seq: " + items[3]);
+                            Save sav = new Save(int.Parse(items[0]), int.Parse(items[1]),
+                                items[2] == "black" ? STONE.black : STONE.white, int.Parse(items[3]));
+                            lstSave.Add(sav);
+                        }
+                        sr.Close();
                     }
+                    Console.WriteLine("lstSave count: " + lstSave.Count);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Console.WriteLine("OK");
+                    MessageBox.Show(ex.Message);
                 }
+                saveFlag = true;
+                sequence = 0;
+                Console.WriteLine("Sequence after reset: " + sequence);
             }
         }
 
