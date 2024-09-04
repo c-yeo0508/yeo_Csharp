@@ -303,22 +303,15 @@ namespace Gomoku
             Undo();
         }
 
+        //感想戦モードでマウスをクリックした時の処理
         private void postMortem()
         {
-            Console.WriteLine("Sequence before drawing: " + sequence);
-            Console.WriteLine("lstSave count before drawing: " + lstSave.Count);
-
+            //リストの
             if (sequence < lstSave.Count)
-            {
-                Console.WriteLine("Drawing stone with sequence: " + sequence);
                 drawAStone(lstSave[sequence++]);
-            }
-            else
-            {
-                Console.WriteLine("No more stones to draw. Sequence: " + sequence + ", Count: " + lstSave.Count);
-            }
         }
 
+        //感想戦モードで碁石を順番に描く
         private void drawAStone(Save item)
         {
             int x = item.X;
@@ -349,6 +342,7 @@ namespace Gomoku
                 goban[x, y] = STONE.white;
             }
 
+            //感想戦モードが終わった場合の処理
             if (sequence == lstSave.Count)
             {
                 DialogResult kEnd;
@@ -364,7 +358,11 @@ namespace Gomoku
 
         private void postMortemToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
+            //感想戦ボタンの処理
+            //現在のゲームを初期化（碁盤初期化）
             setGame();
+            //ゲームデータが格納されているcsvファイルを開く
             string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "Post mortem");
             OpenFileDialog openfile = new OpenFileDialog();
             openfile.InitialDirectory = folderPath;
@@ -376,6 +374,7 @@ namespace Gomoku
             {
                 string fileName = openfile.FileName;
 
+                //csvファイルの中身を読み込む
                 try
                 {
                     using (StreamReader sr = new StreamReader(fileName))
@@ -384,18 +383,13 @@ namespace Gomoku
                         while ((line = sr.ReadLine()) != null)
                         {
                             string[] items = line.Split(',');
-
-                            Console.WriteLine("x:"+items[0]);
-                            Console.WriteLine("y:"+items[1]);
-                            Console.WriteLine("stone:"+items[2]);
-                            Console.WriteLine("seq:"+items[3]);
                             Save sav = new Save(int.Parse(items[0]), int.Parse(items[1]),
                                 items[2] == "black" ? STONE.black : STONE.white, int.Parse(items[3]));
+                            //読み込んだデータをリストに格納
                             lstSave.Add(sav);
                         }
                         sr.Close();
                     }
-                    Console.WriteLine("lstSave count: " + lstSave.Count);
                 }
                 catch (Exception ex)
                 {
@@ -403,7 +397,6 @@ namespace Gomoku
                 }
                 saveFlag = true;
                 sequence = 0;
-                Console.WriteLine("Sequence after reset: " + sequence);
             }
         }
 
@@ -426,64 +419,45 @@ namespace Gomoku
                 else
                     break;
 
-            if (cnt >= 5)
-            {
-                WinGame(x, y);
-                return;
-            }
-
-            cnt = 1;
+            int cns = 1;
 
             //上方向
             for (int j = y - 1; j >= 0; j--)
                 if (goban[x, j] == goban[x, y])
-                    cnt++;
+                    cns++;
                 else
                     break;
 
             //下方向
             for (int j = y + 1; j < 19; j++)
                 if (goban[x, j] == goban[x, y])
-                    cnt++;
+                    cns++;
                 else
                     break;
 
-            if (cnt >= 5)
-            {
-                WinGame(x, y);
-                return;
-            }
-
-            cnt = 1;
+            int cnd = 1;
 
             //左上方向
-            for (int i = x - 1, j = y -1; i >= 0 && j >= 0; i-- , j--)
-                    if (goban[i, j] == goban[x, y])
-                        cnt++;
-                    else
-                        break;
+            for (int i = x - 1, j = y - 1; i >= 0 && j >= 0; i--, j--)
+                if (goban[i, j] == goban[x, y])
+                    cnd++;
+                else
+                    break;
 
             //右下
             for (int i = x + 1, j = y + 1; i < 19 && j < 19; i++, j++)
                 if (goban[i, j] == goban[x, y])
-                    cnt++;
+                    cnd++;
                 else
                     break;
 
-            if (cnt >= 5)
-            {
-                WinGame(x, y);
-                return;
-            }
-
-
-            cnt = 1;
+            int cnf = 1;
 
             //右上
 
             for (int i = x + 1, j = y - 1; i < 19 && j >= 0; i++, j--)
                 if (goban[i, j] == goban[x, y])
-                    cnt++;
+                    cnf++;
                 else
                     break;
 
@@ -491,16 +465,46 @@ namespace Gomoku
 
             for (int i = x - 1, j = y + 1; i >= 0 && j < 19; i--, j++)
                 if (goban[i, j] == goban[x, y])
-                    cnt++;
+                    cnf++;
                 else
                     break;
 
-            if (cnt >= 5)
+            if (cnt >= 5 || cns>=5 || cnf>=5 || cnd >=5)
             {
-                WinGame(x, y);
-                return;
-            }
+                if (goban[x, y] == STONE.white)
+                {
+                    WinGame(x, y);
+                }
 
+                // 黒い碁石が六つ並んだ場合
+                else if (goban[x, y] == STONE.black)
+                {
+                    if (cnt == 5 || cns == 5 || cnf == 5 || cnd == 5) 
+                    {
+                        WinGame(x, y);
+                    }
+                    else if (cnt >= 6 || cns >= 6 || cnf >= 6 || cnd >= 6)
+                    {
+                        kinsi(); 
+                    }
+                }
+            }
         }
+        
+        private void kinsi() 
+        {
+            Save lastSave = lstSave.Last();
+            lstSave.Remove(lastSave);
+            goban[lastSave.X, lastSave.Y] = STONE.none;
+            this.Refresh();
+            stoneCnt = lastSave.seq;
+            flag = !flag;
+            MessageBox.Show("長連の禁じ手です。\n他の場所に置いてください。", "禁じ手");
+        }
+        //private void checkrule(int x, int y)
+        //{
+        //    if (goban[x, y] == STONE.black)
+        //        for (int)
+        //}
     }
 }
