@@ -22,9 +22,9 @@ namespace Gomoku
         int distance = 28;　//線と線の間の距離
         int stoneSize = 27; //碁石の大きさ
         int stoneCnt = 1; //碁石の順番をカウント
-        
 
-        List<Save> lstSave = new List<Save> ();
+
+        List<Save> lstSave = new List<Save>();
         int sequence = 0;
         bool saveFlag = false;
         bool showCountFlag = false;
@@ -87,7 +87,7 @@ namespace Gomoku
                         g.DrawImage(bmp, margin + x * distance - stoneSize / 2,
                             margin + y * distance - stoneSize / 2, stoneSize, stoneSize);
 
-                        ShowCount(GetStoneCount(x,y), Brushes.White, new Rectangle(
+                        ShowCount(GetStoneCount(x, y), Brushes.White, new Rectangle(
                             margin + x * distance - (stoneSize / 2),
                             margin + y * distance - (stoneSize / 2),
                             stoneSize, stoneSize));
@@ -179,6 +179,7 @@ namespace Gomoku
             //明日確認
             stoneCnt = 1;
             lstSave.Clear();
+            saveFlag = false;
 
             //for (int x = 0; x < 19; x++)
             //    for (int y = 0; y < 19; y++)
@@ -236,13 +237,13 @@ namespace Gomoku
 
             DialogResult end;
 
-            if (goban[x,y] == STONE.black)
+            if (goban[x, y] == STONE.black)
             {
-                end = MessageBox.Show("黒の勝ちです!\n新しいゲームを始めますか？","ゲーム終了",MessageBoxButtons.YesNo);
+                end = MessageBox.Show("黒の勝ちです!\n新しいゲームを始めますか？", "ゲーム終了", MessageBoxButtons.YesNo);
             }
             else
             {
-                end = MessageBox.Show("白の勝ちです!\n新しいゲームを始めますか？","ゲーム終了",MessageBoxButtons.YesNo);
+                end = MessageBox.Show("白の勝ちです!\n新しいゲームを始めますか？", "ゲーム終了", MessageBoxButtons.YesNo);
             }
 
             if (end == DialogResult.Yes)
@@ -347,7 +348,18 @@ namespace Gomoku
                 ShowCount(seq, Brushes.Black, r);
                 goban[x, y] = STONE.white;
             }
-            checkWin(x, y);
+
+            if (sequence == lstSave.Count)
+            {
+                DialogResult kEnd;
+
+                kEnd = MessageBox.Show("感想戦が終わりました。!\n新しいゲームを始めますか？", "ゲーム終了", MessageBoxButtons.YesNo);
+
+                if (kEnd == DialogResult.Yes)
+                    setGame();
+                else if (kEnd == DialogResult.No)
+                    this.Close();
+            }
         }
 
         private void postMortemToolStripMenuItem_Click(object sender, EventArgs e)
