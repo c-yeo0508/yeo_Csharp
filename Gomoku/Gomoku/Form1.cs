@@ -14,7 +14,7 @@ using System.Xml.Schema;
 
 namespace Gomoku
 {
-    enum STONE { none, black, white };
+    enum STONE {none,black,white};
 
     public partial class Form1 : Form
     {
@@ -353,7 +353,7 @@ namespace Gomoku
             {
                 DialogResult kEnd;
 
-                kEnd = MessageBox.Show("感想戦が終わりました。!\n新しいゲームを始めますか？", "ゲーム終了", MessageBoxButtons.YesNo);
+                kEnd = MessageBox.Show("感想戦が終わりました。\n新しいゲームを始めますか？", "感想戦終了", MessageBoxButtons.YesNo);
 
                 if (kEnd == DialogResult.Yes)
                     setGame();
@@ -390,7 +390,7 @@ namespace Gomoku
                             Console.WriteLine("stone:"+items[2]);
                             Console.WriteLine("seq:"+items[3]);
                             Save sav = new Save(int.Parse(items[0]), int.Parse(items[1]),
-                                items[2] == " black" ? STONE.black : STONE.white, int.Parse(items[3]));
+                                items[2] == "black" ? STONE.black : STONE.white, int.Parse(items[3]));
                             lstSave.Add(sav);
                         }
                         sr.Close();
