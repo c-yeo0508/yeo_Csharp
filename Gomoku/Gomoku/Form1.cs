@@ -373,12 +373,12 @@ namespace Gomoku
                         {
                             string[] items = line.Split(',');
 
-                            Console.WriteLine("x: " + items[0]);
-                            Console.WriteLine("y: " + items[1]);
-                            Console.WriteLine("stone: " + items[2]);
-                            Console.WriteLine("seq: " + items[3]);
+                            Console.WriteLine("x:"+items[0]);
+                            Console.WriteLine("y:"+items[1]);
+                            Console.WriteLine("stone:"+items[2]);
+                            Console.WriteLine("seq:"+items[3]);
                             Save sav = new Save(int.Parse(items[0]), int.Parse(items[1]),
-                                items[2] == "black" ? STONE.black : STONE.white, int.Parse(items[3]));
+                                items[2] == " black" ? STONE.black : STONE.white, int.Parse(items[3]));
                             lstSave.Add(sav);
                         }
                         sr.Close();
