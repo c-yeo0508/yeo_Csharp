@@ -14,7 +14,8 @@ using System.Xml.Schema;
 
 namespace Gomoku
 {
-    enum STONE {none,black,white};
+    enum STONE { none, black, white };
+
 
     public partial class Form1 : Form
     {
@@ -33,6 +34,9 @@ namespace Gomoku
         Pen pen;
         Brush wBrush, bBrush;
         Font font = new Font("Gothic", 10);
+
+        private readonly int[] dx = { 1, 0, 1, 1, -1, 0, -1, -1 }; // 8방향
+        private readonly int[] dy = { 0, 1, 1, -1, 1, -1, 0, -1 }; // 8방향
 
         public Form1()
         {
@@ -115,10 +119,10 @@ namespace Gomoku
                 return;
             }
 
+
             //マウスクリックの座標を設定
             int x = (e.X - margin + distance / 2) / distance;
             int y = (e.Y - margin + distance / 2) / distance;
-
 
             //マウスのクリックで石を置く
             //if (goban[x, y] != STONE.none)
@@ -142,6 +146,15 @@ namespace Gomoku
                 ShowCount(stoneCnt, Brushes.White, r);
                 lstSave.Add(new Save(x, y, STONE.black, stoneCnt++));
                 flag = true;
+                //黒が打つタイミングで禁じ手をチェック
+                if (IsDoubleThree(x, y, STONE.black))
+                {
+                    goban[x, y] = STONE.none;
+                    kinsi();
+                    flag = false;
+                    MessageBox.Show("先手の三々は禁じ手です。", "禁じ手");
+                    return;
+                }
                 goban[x, y] = STONE.black;
             }
             else
@@ -155,9 +168,8 @@ namespace Gomoku
                 goban[x, y] = STONE.white;
             }
             checkWin(x, y);
-
-
         }
+
         private int GetStoneCount(int x, int y)
         {
             foreach (var item in lstSave)
@@ -402,9 +414,7 @@ namespace Gomoku
 
         private void checkWin(int x, int y)
         {
-
             int cnt = 1;
-
             //右方向
             for (int i = x + 1; i < 19; i++)
                 if (goban[i, y] == goban[x, y])
@@ -469,29 +479,30 @@ namespace Gomoku
                 else
                     break;
 
-            if (cnt >= 5 || cns>=5 || cnf>=5 || cnd >=5)
+            if (cnt >= 5 || cns >= 5 || cnf >= 5 || cnd >= 5)
             {
                 if (goban[x, y] == STONE.white)
                 {
                     WinGame(x, y);
                 }
 
-                // 黒い碁石が六つ並んだ場合
+                // 禁じ手長連
                 else if (goban[x, y] == STONE.black)
                 {
-                    if (cnt == 5 || cns == 5 || cnf == 5 || cnd == 5) 
+                    if (cnt == 5 || cns == 5 || cnf == 5 || cnd == 5)
                     {
                         WinGame(x, y);
                     }
                     else if (cnt >= 6 || cns >= 6 || cnf >= 6 || cnd >= 6)
                     {
-                        kinsi(); 
+                        kinsi();
+                        MessageBox.Show("先手の長連は禁じ手です。", "禁じ手");
                     }
                 }
             }
         }
-        
-        private void kinsi() 
+
+        private void kinsi()
         {
             Save lastSave = lstSave.Last();
             lstSave.Remove(lastSave);
@@ -499,12 +510,79 @@ namespace Gomoku
             this.Refresh();
             stoneCnt = lastSave.seq;
             flag = !flag;
-            MessageBox.Show("長連の禁じ手です。\n他の場所に置いてください。", "禁じ手");
         }
-        //private void checkrule(int x, int y)
-        //{
-        //    if (goban[x, y] == STONE.black)
-        //        for (int)
-        //}
+
+        //禁じ手の3x3
+        private bool IsDoubleThree(int x, int y, STONE stone)
+        {
+            goban[x, y] = stone;
+
+            int doubleThreeCount = 0;
+
+            for (int d = 0; d < 8; d++)
+            {
+                int count = CountInDirection(x, y, stone, d);
+
+                if (count >= 3) //3目
+                {
+                    if (IsBlockedByWhiteInDirection(x, y, stone, d))
+                    {
+                        doubleThreeCount++;
+                    }
+                }
+            }
+
+            goban[x, y] = STONE.none;
+
+            return doubleThreeCount >= 2;
+        }
+        //碁石が連続して並んでいるか
+        private int CountInDirection(int x, int y, STONE stone, int direction)
+        {
+            int count = 1;
+            int dirX = dx[direction];
+            int dirY = dy[direction];
+
+            //方向に連続で並んでいる石
+            for (int i = 1; i <= 4; i++)
+            {
+                int nx = x + dirX * i;
+                int ny = y + dirY * i;
+                if (nx >= 0 && nx < 19 && ny >= 0 && ny < 19 && goban[nx, ny] == stone)
+                {
+                    count++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return count;
+        }
+        private bool IsBlockedByWhiteInDirection(int x, int y, STONE stone, int direction)
+        {
+            int dirX = dx[direction];
+            int dirY = dy[direction];
+
+            // ３マス以内に白が存在するか
+            for (int i = 1; i <= 3; i++)
+            {
+                int nx = x + dirX * i;
+                int ny = y + dirY * i;
+
+                // 碁盤の範囲確認（？）
+                if (nx < 0 || ny < 0 || nx >= goban.GetLength(0) || ny >= goban.GetLength(1))
+                {
+                    return true;
+                }
+
+                if (goban[nx, ny] == STONE.white)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }
