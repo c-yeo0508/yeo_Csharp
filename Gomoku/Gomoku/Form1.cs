@@ -14,7 +14,7 @@ using System.Xml.Schema;
 
 namespace Gomoku
 {
-    enum STONE { none, black, white };
+    enum STONE {none,black,white};
 
 
     public partial class Form1 : Form
