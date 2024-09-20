@@ -35,11 +35,12 @@ namespace Gomoku
         Brush wBrush, bBrush;
         Font font = new Font("Gothic", 10);
 
-        private readonly int[] dx = { 1, 0, 1, 1, -1, 0, -1, -1 }; // 方向
-        private readonly int[] dy = { 0, 1, 1, -1, 1, -1, 0, -1 }; // 方向
+        //private readonly int[] dx = { 1, 0, 1, 1, -1, 0, -1, -1 }; // 方向
+        //private readonly int[] dy = { 0, 1, 1, -1, 1, -1, 0, -1 }; // 方向
 
-        //private readonly int[] dx = { 1, -1, 0, 0, 1, -1, 1, -1 }; // 方向
-        //private readonly int[] dy = { 0, 0, -1, 1, 1, -1, -1, 1 };
+        private readonly int[] dx = { 0, 1, 1, 1, 0, -1, -1, -1 }; // 方向
+        private readonly int[] dy = { -1, -1, 0, 1, 1, 1, 0, -1 }; // 方向
+
 
         public Form1()
         {
@@ -526,9 +527,9 @@ namespace Gomoku
 
                 Console.WriteLine($"Direction: {d}, Count: {count}");
 
-                if (count == 3) // 3목
+                if (count == 3)
                 {
-                    if (IsBlockedByWhiteInDirection(x, y, stone, d) && IsBlockedByWhiteInDirection(x, y, stone, (d + 4) % 8))
+                    if (!IsBlockedByWhiteInDirection(x, y, stone, d))
                     {
                         doubleThreeCount++;
                         Console.WriteLine($"Double three count increased: {doubleThreeCount}");
@@ -536,10 +537,8 @@ namespace Gomoku
                 }
             }
 
-            // Check for double three only if there are already two or more three-in-a-rows
             if (doubleThreeCount < 2)
             {
-                doubleThreeCount = 0;
                 doubleThreeCount = CheckAdjacentStonesAndThree(x, y, stone);
             }
 
@@ -548,13 +547,13 @@ namespace Gomoku
             Console.WriteLine($"Final double three count: {doubleThreeCount}");
             return doubleThreeCount >= 2;
         }
+
         private int CountInBothDirections(int x, int y, STONE stone, int direction)
         {
             int count = 1;
             int dirX = dx[direction];
             int dirY = dy[direction];
 
-            // 連続に並んでいる石確認
             for (int i = 1; i <= 3; i++)
             {
                 int nx = x + dirX * i;
@@ -569,7 +568,6 @@ namespace Gomoku
                 }
             }
 
-            // 逆方向
             dirX = dx[(direction + 4) % 8];
             dirY = dy[(direction + 4) % 8];
             for (int i = 1; i <= 3; i++)
@@ -588,15 +586,13 @@ namespace Gomoku
 
             return count;
         }
+
         private bool IsBlockedByWhiteInDirection(int x, int y, STONE stone, int direction)
         {
             int dirX = dx[direction];
             int dirY = dy[direction];
-            bool blocked = true;
 
-            Console.WriteLine($"Checking direction: {direction}, dirX: {dirX}, dirY: {dirY}");
-
-            // Forward direction
+            // 연속된 흑돌의 끝부분 확인
             for (int i = 1; i <= 3; i++)
             {
                 int nx = x + dirX * i;
@@ -604,19 +600,20 @@ namespace Gomoku
 
                 if (nx < 0 || ny < 0 || nx >= goban.GetLength(0) || ny >= goban.GetLength(1))
                 {
-                    Console.WriteLine($"Out of bounds: nx={nx}, ny={ny}");
-                    return true; // 보드 경계를 벗어나면 막힌 것으로 간주
+                    return true;
                 }
 
                 if (goban[nx, ny] == STONE.white)
                 {
-                    Console.WriteLine($"Blocked by white at: nx={nx}, ny={ny}");
-                    blocked = false; // 흰 돌이 있으면 막힌 것이 아님
+                    return true;
+                }
+
+                if (goban[nx, ny] != stone)
+                {
                     break;
                 }
             }
 
-            // Backward direction
             for (int i = 1; i <= 3; i++)
             {
                 int nx = x - dirX * i;
@@ -624,28 +621,28 @@ namespace Gomoku
 
                 if (nx < 0 || ny < 0 || nx >= goban.GetLength(0) || ny >= goban.GetLength(1))
                 {
-                    Console.WriteLine($"Out of bounds: nx={nx}, ny={ny}");
-                    return true; // 보드 경계를 벗어나면 막힌 것으로 간주
+                    return true;
                 }
 
                 if (goban[nx, ny] == STONE.white)
                 {
-                    Console.WriteLine($"Blocked by white at: nx={nx}, ny={ny}");
-                    blocked = false; // 흰 돌이 있으면 막힌 것이 아님
+                    return true;
+                }
+
+                if (goban[nx, ny] != stone)
+                {
                     break;
                 }
             }
 
-            Console.WriteLine($"Blocked: {blocked}");
-            return blocked; // 양쪽 모두 막혀 있으면 true
+            return false;
         }
-
 
         private int CheckAdjacentStonesAndThree(int x, int y, STONE stone)
         {
             int count = 0;
 
-            for (int d = 0; d < 4; d++) // 4방향만 검사
+            for (int d = 0; d < 4; d++)
             {
                 int dirX = dx[d];
                 int dirY = dy[d];
@@ -662,7 +659,7 @@ namespace Gomoku
 
                     for (int d2 = 0; d2 < 4; d2++)
                     {
-                        if (CountInBothDirections(nx1, ny1, stone, d2) == 3)
+                        if (CountInBothDirections(nx1, ny1, stone, d2) == 3 && !IsBlockedByWhiteInDirection(nx1, ny1, stone, d2))
                         {
                             threeCount1++;
                         }
@@ -672,7 +669,7 @@ namespace Gomoku
                         }
                     }
 
-                    if (threeCount1 >= 2 && IsBlockedByWhiteInDirection(nx1, ny1, stone, d))
+                    if (threeCount1 >= 2)
                     {
                         count++;
                     }
@@ -681,25 +678,30 @@ namespace Gomoku
                     {
                         int threeCount2 = 0;
 
-                        for (int d2 = 0; d2 < 8; d2++) // 8方向
+                        for (int d2 = 0; d2 < 8; d2++)
                         {
-                            if (CountInBothDirections(nx2, ny2, stone, d2) == 3)
+                            if (CountInBothDirections(nx2, ny2, stone, d2) == 3 && !IsBlockedByWhiteInDirection(nx2, ny2, stone, d2))
                             {
                                 threeCount2++;
                             }
-                            else if (CountInBothDirections(nx2, ny2, stone, d2) == 5)
+                            else if (CountInBothDirections(nx1, ny1, stone, d2) == 5)
                             {
                                 return 0;
                             }
                         }
-                        if (threeCount2 >= 2 && IsBlockedByWhiteInDirection(nx2, ny2, stone, d))
+                        if (threeCount2 >= 2)
                         {
                             count++;
+                        }
+                        else
+                        {
+                            count--;
                         }
                     }
                 }
             }
             return count;
         }
+
     }
-    }
+}
