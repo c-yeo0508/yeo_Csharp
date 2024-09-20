@@ -132,6 +132,10 @@ namespace Gomoku
             if (x < 0 || x >= 19 || y < 0 || y >= 19 || goban[x, y] != STONE.none)
                 return;
 
+            //範囲外(左または上方向)への設置を防止
+            if (e.X < margin - distance / 2 || e.Y < margin -distance / 2)
+                return;
+
             Rectangle r = new Rectangle(
                 margin + distance * x - (stoneSize / 2),
                 margin + distance * y - (stoneSize / 2),
